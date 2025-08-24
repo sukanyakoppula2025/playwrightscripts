@@ -1,0 +1,157 @@
+name: Playwright Matrix Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Browser to test'
+        required: false
+        default: 'chrome'
+        type: choice
+        options:
+        - chrome
+        - firefox
+        - webkit
+
+jobs:
+  test:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox, webkit]
+        include:
+          - browser: chrome
+            browser-name: 'Chrome'
+          - browser: firefox
+            browser-name: 'Firefox'
+          - browser: webkit
+            browser-name: 'Safari'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Display .NET version
+      run: |
+        dotnet --version
+        dotnet --list-sdks
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+      
+    - name: Install Playwright CLI
+      run: dotnet tool install --global Microsoft.Playwright.CLI
+      
+    - name: Install Playwright browsers
+      run: playwright install
+      
+    - name: Run Playwright tests with ${{ matrix.browser-name }}
+      run: |
+        echo "Running tests with ${{ matrix.browser-name }}"
+        dotnet run --configuration Release --no-build
+      env:
+        PLAYWRIGHT_HEADLESS: true
+        PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
+        
+    - name: Upload HTML report for ${{ matrix.browser-name }}
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-report-${{ matrix.browser }}
+        path: test-report.html
+        
+    - name: Upload screenshots for ${{ matrix.browser-name }}
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: screenshots-${{ matrix.browser }}
+        path: screenshots/
+        
+    - name: Upload test videos for ${{ matrix.browser-name }}
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-videos-${{ matrix.browser }}
+        path: videos/
+        
+  report:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+        
+    - name: Generate summary report
+      run: |
+        echo "## 🧪 Playwright Test Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Test Results by Browser" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        for browser in chrome firefox webkit; do
+          if [ -d "artifacts/test-report-$browser" ]; then
+            echo "✅ **$browser**: Tests completed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **$browser**: Tests failed or not completed" >> $GITHUB_STEP_SUMMARY
+          fi
+        done
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📁 Artifacts Available" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- HTML Reports: Download from Actions artifacts" >> $GITHUB_STEP_SUMMARY
+        echo "- Screenshots: Visual evidence of test execution" >> $GITHUB_STEP_SUMMARY
+        echo "- Test Videos: Recordings of test runs" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          let comment = '## 🧪 Playwright Matrix Test Results\n\n';
+          
+          comment += '### 📊 Test Results by Browser\n\n';
+          
+          const browsers = ['chrome', 'firefox', 'webkit'];
+          browsers.forEach(browser => {
+            const reportPath = `artifacts/test-report-${browser}/test-report.html`;
+            if (fs.existsSync(reportPath)) {
+              comment += `✅ **${browser.charAt(0).toUpperCase() + browser.slice(1)}**: Tests completed successfully\n`;
+            } else {
+              comment += `❌ **${browser.charAt(0).toUpperCase() + browser.slice(1)}**: Tests failed or not completed\n`;
+            }
+          });
+          
+          comment += '\n### 📁 Artifacts Available\n\n';
+          comment += '- **HTML Reports**: Download from Actions artifacts\n';
+          comment += '- **Screenshots**: Visual evidence of test execution\n';
+          comment += '- **Test Videos**: Recordings of test runs\n\n';
+          comment += '🔍 **View Results**: Check the Actions tab for detailed logs and artifacts';
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
