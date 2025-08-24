@@ -5,34 +5,11 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main, develop ]
-  workflow_dispatch:
-    inputs:
-      test-scenario:
-        description: 'Specific test scenario to run'
-        required: false
-        default: 'all'
-        type: choice
-        options:
-        - all
-        - bedbath-tests
-        - gmail-tests
-        - google-search-tests
-        - html-reports
-      browser:
-        description: 'Browser to test with'
-        required: false
-        default: 'chromium'
-        type: choice
-        options:
-        - chromium
-        - firefox
-        - webkit
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
-  test-bedbath:
-    name: 🛏️ Bed Bath & Beyond Tests
+  test:
     runs-on: windows-latest
-    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'bedbath-tests'
     
     steps:
     - name: Checkout code
@@ -44,236 +21,29 @@ jobs:
         dotnet-version: '8.0.x'
         
     - name: Build Bed Bath & Beyond Tests
-      run: dotnet build "BedBathBeyondTests.csproj" --configuration Release
-        
-    - name: Install Playwright
-      run: |
-        dotnet tool install --global Microsoft.Playwright.CLI
-        playwright install
-        
-    - name: Run Bed Bath & Beyond Tests
-      run: |
-        echo "Running Bed Bath & Beyond Tests..."
-        dotnet run --project "BedBathBeyondTests.csproj" --configuration Release --no-build
-      env:
-        PLAYWRIGHT_HEADLESS: true
-        PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
-        
-    - name: Upload Bed Bath & Beyond Test Results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: bedbath-results
-        path: |
-          screenshots/
-          videos/
-          reports/
-          
-  test-gmail:
-    name: 📧 Gmail Tests
-    runs-on: windows-latest
-    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'gmail-tests'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
+      run: dotnet build "BedBathBeyondTests.csproj"
         
     - name: Build Gmail Tests
-      run: dotnet build "GmailTests.csproj" --configuration Release
-        
-    - name: Install Playwright
-      run: |
-        dotnet tool install --global Microsoft.Playwright.CLI
-        playwright install
-        
-    - name: Run Gmail Tests
-      run: |
-        echo "Running Gmail Tests..."
-        dotnet run --project "GmailTests.csproj" --configuration Release --no-build
-      env:
-        PLAYWRIGHT_HEADLESS: true
-        PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
-        
-    - name: Upload Gmail Test Results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: gmail-results
-        path: |
-          screenshots/
-          videos/
-          reports/
-          
-  test-google-search:
-    name: 🔍 Google Search Tests
-    runs-on: windows-latest
-    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'google-search-tests'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
+      run: dotnet build "GmailTests.csproj"
         
     - name: Build Google Search Tests
-      run: dotnet build "GoogleSearchTests.csproj" --configuration Release
+      run: dotnet build "GoogleSearchTests.csproj"
         
-    - name: Install Playwright
-      run: |
-        dotnet tool install --global Microsoft.Playwright.CLI
-        playwright install
+    - name: Run Bed Bath & Beyond Tests
+      run: dotnet run --project "BedBathBeyondTests.csproj" --configuration Release
+        
+    - name: Run Gmail Tests
+      run: dotnet run --project "GmailTests.csproj" --configuration Release
         
     - name: Run Google Search Tests
-      run: |
-        echo "Running Google Search Tests..."
-        dotnet run --project "GoogleSearchTests.csproj" --configuration Release --no-build
-      env:
-        PLAYWRIGHT_HEADLESS: true
-        PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
+      run: dotnet run --project "GoogleSearchTests.csproj" --configuration Release
         
-    - name: Upload Google Search Test Results
+    - name: Upload test artifacts
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: google-search-results
+        name: test-results
         path: |
           screenshots/
           videos/
           reports/
-          
-  generate-html-reports:
-    name: 📊 HTML Report Generation
-    runs-on: windows-latest
-    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'html-reports'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-        
-    - name: Build Bed Bath & Beyond Tests
-      run: dotnet build "BedBathBeyondTests.csproj" --configuration Release
-        
-    - name: Install Playwright
-      run: |
-        dotnet tool install --global Microsoft.Playwright.CLI
-        playwright install
-        
-    - name: Generate HTML Report Demo
-      run: |
-        echo "Generating HTML Report Demo..."
-        dotnet run --project "BedBathBeyondTests.csproj" --configuration Release --no-build
-      env:
-        PLAYWRIGHT_HEADLESS: true
-        PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
-        
-    - name: Upload Generated Reports
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: html-reports-generated
-        path: reports/
-        
-  summary-report:
-    name: 📋 Test Summary Report
-    runs-on: ubuntu-latest
-    needs: [test-bedbath, test-gmail, test-google-search, generate-html-reports]
-    if: always()
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Download all artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: artifacts
-        
-    - name: Generate comprehensive summary
-      run: |
-        echo "## 🧪 Comprehensive Playwright Test Summary" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 🧪 Test Projects Executed" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        
-        # Check which test projects were run
-        if [ -d "artifacts/bedbath-results" ]; then
-          echo "✅ **Bed Bath & Beyond Tests**: Completed successfully" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        if [ -d "artifacts/gmail-results" ]; then
-          echo "✅ **Gmail Tests**: Completed successfully" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        if [ -d "artifacts/google-search-results" ]; then
-          echo "✅ **Google Search Tests**: Completed successfully" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        if [ -d "artifacts/html-reports-generated" ]; then
-          echo "✅ **HTML Report Generation**: Completed successfully" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 📁 Artifacts Available" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "- **Test Results**: Screenshots, videos, and logs" >> $GITHUB_STEP_SUMMARY
-        echo "- **HTML Reports**: Professional test execution reports" >> $GITHUB_STEP_SUMMARY
-        echo "- **Configuration**: Environment-specific test settings" >> $GITHUB_STEP_SUMMARY
-        
-    - name: Comment PR with comprehensive results
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const fs = require('fs');
-          let comment = '## 🧪 Comprehensive Playwright Test Results\n\n';
-          
-          comment += '### 🧪 Test Projects Executed\n\n';
-          
-          const projects = [
-            { name: 'Bed Bath & Beyond Tests', path: 'artifacts/bedbath-results' },
-            { name: 'Gmail Tests', path: 'artifacts/gmail-results' },
-            { name: 'Google Search Tests', path: 'artifacts/google-search-results' },
-            { name: 'HTML Report Generation', path: 'artifacts/html-reports-generated' }
-          ];
-          
-          projects.forEach(project => {
-            if (fs.existsSync(project.path)) {
-              comment += `✅ **${project.name}**: Completed successfully\n`;
-            } else {
-              comment += `❌ **${project.name}**: Not executed or failed\n`;
-            }
-          });
-          
-          comment += '\n### 🚀 Key Features\n\n';
-          comment += '- **🛏️ Bed Bath & Beyond**: Login automation, Furniture navigation\n';
-          comment += '- **📧 Gmail**: Login automation with enhanced scenarios\n';
-          comment += '- **🔍 Google Search**: Web search automation\n';
-          comment += '- **📊 HTML Reports**: Professional test result generation\n';
-          comment += '- **⚙️ Configuration**: Environment-specific test settings\n';
-          comment += '- **🔄 Cross-browser**: Support for Chrome, Firefox, Safari\n\n';
-          
-          comment += '### 📁 Artifacts Available\n\n';
-          comment += '- **Test Results**: Screenshots, videos, and execution logs\n';
-          comment += '- **HTML Reports**: Professional test execution reports\n';
-          comment += '- **Configuration**: Environment-specific test settings\n\n';
-          comment += '🔍 **View Results**: Check the Actions tab for detailed logs and artifacts';
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
