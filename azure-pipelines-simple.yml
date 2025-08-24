@@ -23,12 +23,6 @@ stages:
   - job: PlaywrightTests
     displayName: 'Execute Playwright Tests'
     steps:
-    - task: UseDotNetVersion@2
-      displayName: 'Use .NET 8.0'
-      inputs:
-        version: '$(dotNetVersion)'
-        includePreviewVersions: false
-
     - script: |
         dotnet --version
       displayName: 'Display .NET version'

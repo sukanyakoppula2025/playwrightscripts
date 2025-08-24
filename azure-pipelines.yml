@@ -27,11 +27,10 @@ stages:
   - job: PlaywrightTests
     displayName: 'Execute Playwright Tests'
     steps:
-    - task: UseDotNetVersion@2
-      displayName: 'Use .NET 8.0'
-      inputs:
-        version: '$(dotNetVersion)'
-        includePreviewVersions: false
+    - script: |
+        dotnet --version
+        dotnet --list-sdks
+      displayName: 'Display .NET version info'
 
     - task: Cache@2
       displayName: 'Cache NuGet packages'
@@ -50,11 +49,6 @@ stages:
         path: '$(USERPROFILE)\AppData\Local\ms-playwright'
 
     - script: |
-        dotnet --version
-        dotnet --list-sdks
-      displayName: 'Display .NET version info'
-
-    - script: |
         dotnet restore
       displayName: 'Restore NuGet packages'
 
@@ -71,20 +65,11 @@ stages:
       displayName: 'Install Playwright browsers'
 
     - script: |
-        dotnet test --configuration $(buildConfiguration) --no-build --logger trx --results-directory $(Build.ArtifactStagingDirectory)/TestResults
+        dotnet run --configuration $(buildConfiguration) --no-build
       displayName: 'Run Playwright tests'
       env:
         PLAYWRIGHT_HEADLESS: 'true'
         PLAYWRIGHT_BROWSERS_PATH: '$(USERPROFILE)\AppData\Local\ms-playwright'
-
-    - task: PublishTestResults@2
-      displayName: 'Publish test results'
-      inputs:
-        testResultsFormat: 'VSTest'
-        testResultsFiles: '**/*.trx'
-        mergeTestResults: true
-        testRunTitle: 'Playwright Tests'
-      condition: succeededOrFailed()
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish test artifacts'
