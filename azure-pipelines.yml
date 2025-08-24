@@ -1,0 +1,136 @@
+# Azure DevOps Pipeline for Playwright Tests
+# This pipeline runs your Google Search Playwright tests in CI/CD
+
+trigger:
+  - main
+  - develop
+  - feature/*
+
+pr:
+  - main
+  - develop
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  dotNetVersion: '8.0.x'
+  playwrightVersion: '1.54.0'
+
+stages:
+- stage: Test
+  displayName: 'Run Playwright Tests'
+  jobs:
+  - job: PlaywrightTests
+    displayName: 'Execute Playwright Tests'
+    steps:
+    - task: UseDotNetVersion@2
+      displayName: 'Use .NET 8.0'
+      inputs:
+        version: '$(dotNetVersion)'
+        includePreviewVersions: false
+
+    - task: Cache@2
+      displayName: 'Cache NuGet packages'
+      inputs:
+        key: 'nuget | "$(Agent.OS)" | **/packages.lock.json'
+        restoreKeys: |
+          nuget | "$(Agent.OS)"
+        path: '$(NUGET_PACKAGES)'
+
+    - task: Cache@2
+      displayName: 'Cache Playwright browsers'
+      inputs:
+        key: 'playwright | "$(Agent.OS)" | $(playwrightVersion)'
+        restoreKeys: |
+          playwright | "$(Agent.OS)"
+        path: '$(USERPROFILE)\AppData\Local\ms-playwright'
+
+    - script: |
+        dotnet --version
+        dotnet --list-sdks
+      displayName: 'Display .NET version info'
+
+    - script: |
+        dotnet restore
+      displayName: 'Restore NuGet packages'
+
+    - script: |
+        dotnet build --configuration $(buildConfiguration) --no-restore
+      displayName: 'Build solution'
+
+    - script: |
+        dotnet tool install --global Microsoft.Playwright.CLI
+      displayName: 'Install Playwright CLI'
+
+    - script: |
+        playwright install
+      displayName: 'Install Playwright browsers'
+
+    - script: |
+        dotnet test --configuration $(buildConfiguration) --no-build --logger trx --results-directory $(Build.ArtifactStagingDirectory)/TestResults
+      displayName: 'Run Playwright tests'
+      env:
+        PLAYWRIGHT_HEADLESS: 'true'
+        PLAYWRIGHT_BROWSERS_PATH: '$(USERPROFILE)\AppData\Local\ms-playwright'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish test results'
+      inputs:
+        testResultsFormat: 'VSTest'
+        testResultsFiles: '**/*.trx'
+        mergeTestResults: true
+        testRunTitle: 'Playwright Tests'
+      condition: succeededOrFailed()
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish test artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/TestResults'
+        ArtifactName: 'TestResults'
+        publishLocation: 'Container'
+      condition: succeededOrFailed()
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish screenshots'
+      inputs:
+        PathtoPublish: 'screenshots'
+        ArtifactName: 'Screenshots'
+        publishLocation: 'Container'
+      condition: succeededOrFailed()
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish HTML report'
+      inputs:
+        PathtoPublish: 'test-report.html'
+        ArtifactName: 'TestReport'
+        publishLocation: 'Container'
+      condition: succeededOrFailed()
+
+- stage: Deploy
+  displayName: 'Deploy to Environment'
+  dependsOn: Test
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+  jobs:
+  - deployment: DeployToProduction
+    displayName: 'Deploy to Production'
+    environment: 'Production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: TestResults
+          - download: current
+            artifact: TestReport
+          - download: current
+            artifact: Screenshots
+          - script: |
+              echo "Deployment completed successfully!"
+              echo "Test Results: $(Pipeline.Workspace)/TestResults"
+              echo "HTML Report: $(Pipeline.Workspace)/TestReport"
+              echo "Screenshots: $(Pipeline.Workspace)/Screenshots"
+            displayName: 'Deployment Summary'

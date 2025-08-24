@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playwright Test Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; text-align: center; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+        .summary { background: white; padding: 25px; border-radius: 10px; margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .summary-item { text-align: center; padding: 20px; border-radius: 8px; }
+        .summary-item.passed { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .summary-item.failed { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .summary-item.total { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .summary-item.time { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .summary-number { font-size: 2em; font-weight: bold; margin-bottom: 5px; }
+        .summary-label { font-size: 0.9em; opacity: 0.8; }
+        .test-results { margin-bottom: 30px; }
+        .test-item { background: white; margin-bottom: 20px; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-header { padding: 20px; border-left: 5px solid; }
+        .test-header.passed { border-left-color: #28a745; background: #f8fff9; }
+        .test-header.failed { border-left-color: #dc3545; background: #fff8f8; }
+        .test-title { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; }
+        .test-status { display: inline-block; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; font-weight: bold; }
+        .test-status.passed { background: #28a745; color: white; }
+        .test-status.failed { background: #dc3545; color: white; }
+        .test-details { padding: 0 20px 20px; }
+        .test-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .info-item { background: #f8f9fa; padding: 15px; border-radius: 5px; }
+        .info-label { font-size: 0.8em; color: #6c757d; margin-bottom: 5px; }
+        .info-value { font-weight: bold; }
+        .test-screenshot { margin: 20px 0; }
+        .test-screenshot img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-logs { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 15px; }
+        .test-logs h4 { margin-bottom: 10px; color: #495057; }
+        .log-entry { margin: 5px 0; padding: 5px 0; border-bottom: 1px solid #e9ecef; }
+        .log-entry:last-child { border-bottom: none; }
+        .footer { text-align: center; padding: 20px; color: #6c757d; font-size: 0.9em; }
+        .timestamp { background: #e9ecef; padding: 10px; border-radius: 5px; margin-top: 15px; text-align: center; }
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .header { padding: 20px; }
+            .header h1 { font-size: 2em; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Playwright Test Report</h1>
+            <p>Automated Playwright Test Results for Google UK</p>
+        </div>
+        <div class="summary">
+            <h2>📊 Test Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-item total">
+                    <div class="summary-number">5</div>
+                    <div class="summary-label">Total Tests</div>
+                </div>
+                <div class="summary-item passed">
+                    <div class="summary-number">5</div>
+                    <div class="summary-label">Passed</div>
+                </div>
+                <div class="summary-item failed">
+                    <div class="summary-number">0</div>
+                    <div class="summary-label">Failed</div>
+                </div>
+                <div class="summary-item time">
+                    <div class="summary-number">100.0%</div>
+                    <div class="summary-label">Success Rate</div>
+                </div>
+            </div>
+            <div class="timestamp">
+                <strong>Total Execution Time:</strong> 73.62 seconds | 
+                <strong>Average Time per Test:</strong> 14.72 seconds | 
+                <strong>Report Generated:</strong> 2025-08-24 19:09:51
+            </div>
+        </div>
+        <div class="test-results">
+            <h2>🧪 Test Results</h2>
+            <div class="test-item">
+                <div class="test-header passed">
+                    <div class="test-title">✅ Navigation Test</div>
+                    <div class="test-status passed">PASSED</div>
+                </div>
+                <div class="test-details">
+                    <div class="test-info">
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">PASSED</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Duration</div>
+                            <div class="info-value">11.35s</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Started</div>
+                            <div class="info-value">18:08:12</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Message</div>
+                            <div class="info-value">Test 'Navigation Test' completed successfully</div>
+                        </div>
+                    </div>
+                    <div class="test-screenshot">
+                        <h4>📸 Test Screenshot</h4>
+                        <img src="screenshots/Navigation_Test_20250824_190822.png" alt="Navigation Test Screenshot" />
+                    </div>
+                    <div class="test-logs">
+                        <h4>📝 Test Logs</h4>
+                        <div class="log-entry">Starting test: Navigation Test</div>
+                        <div class="log-entry">Navigating to Google UK...</div>
+                        <div class="log-entry">Waiting for page to load...</div>
+                        <div class="log-entry">Handling cookie consent if present...</div>
+                        <div class="log-entry">Cookie consent accepted using selector: button:has-text('Accept all')</div>
+                        <div class="log-entry">Checking page title...</div>
+                        <div class="log-entry">Page title: Google</div>
+                        <div class="log-entry">✅ Navigation test passed - Google page loaded successfully</div>
+                        <div class="log-entry">Screenshot saved: screenshots/Navigation_Test_20250824_190822.png</div>
+                        <div class="log-entry">Test completed in 11.35 seconds</div>
+                    </div>
+                </div>
+            </div>
+            <div class="test-item">
+                <div class="test-header passed">
+                    <div class="test-title">✅ Search Test</div>
+                    <div class="test-status passed">PASSED</div>
+                </div>
+                <div class="test-details">
+                    <div class="test-info">
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">PASSED</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Duration</div>
+                            <div class="info-value">38.56s</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Started</div>
+                            <div class="info-value">18:08:27</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Message</div>
+                            <div class="info-value">Test 'Search Test' completed successfully</div>
+                        </div>
+                    </div>
+                    <div class="test-screenshot">
+                        <h4>📸 Test Screenshot</h4>
+                        <img src="screenshots/Search_Test_20250824_190902.png" alt="Search Test Screenshot" />
+                    </div>
+                    <div class="test-logs">
+                        <h4>📝 Test Logs</h4>
+                        <div class="log-entry">Starting test: Search Test</div>
+                        <div class="log-entry">Navigating to Google UK...</div>
+                        <div class="log-entry">Waiting for page to load...</div>
+                        <div class="log-entry">Handling cookie consent if present...</div>
+                        <div class="log-entry">No cookie consent dialog found or already accepted</div>
+                        <div class="log-entry">Finding search element...</div>
+                        <div class="log-entry">Found search element: textarea[name='q']</div>
+                        <div class="log-entry">Typing search query...</div>
+                        <div class="log-entry">Pressing Enter to search...</div>
+                        <div class="log-entry">Waiting for search results...</div>
+                        <div class="log-entry">Trying search results selector: #search</div>
+                        <div class="log-entry">Selector #search failed or no results found</div>
+                        <div class="log-entry">Trying search results selector: #search .g</div>
+                        <div class="log-entry">Selector #search .g failed or no results found</div>
+                        <div class="log-entry">Trying search results selector: #search .rc</div>
+                        <div class="log-entry">Selector #search .rc failed or no results found</div>
+                        <div class="log-entry">Trying search results selector: #search .tF2Cxc</div>
+                        <div class="log-entry">Selector #search .tF2Cxc failed or no results found</div>
+                        <div class="log-entry">Trying search results selector: #search .yuRUbf</div>
+                        <div class="log-entry">Selector #search .yuRUbf failed or no results found</div>
+                        <div class="log-entry">Trying search results selector: #search .LC20lb</div>
+                        <div class="log-entry">Found 8 search results with selector: #search .LC20lb</div>
+                        <div class="log-entry">Final search results count: 8</div>
+                        <div class="log-entry">✅ Search test passed - Results found successfully</div>
+                        <div class="log-entry">Screenshot saved: screenshots/Search_Test_20250824_190902.png</div>
+                        <div class="log-entry">Test completed in 38.56 seconds</div>
+                    </div>
+                </div>
+            </div>
+            <div class="test-item">
+                <div class="test-header passed">
+                    <div class="test-title">✅ Suggestions Test</div>
+                    <div class="test-status passed">PASSED</div>
+                </div>
+                <div class="test-details">
+                    <div class="test-info">
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">PASSED</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Duration</div>
+                            <div class="info-value">7.95s</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Started</div>
+                            <div class="info-value">18:09:08</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Message</div>
+                            <div class="info-value">Test 'Suggestions Test' completed successfully</div>
+                        </div>
+                    </div>
+                    <div class="test-screenshot">
+                        <h4>📸 Test Screenshot</h4>
+                        <img src="screenshots/Suggestions_Test_20250824_190916.png" alt="Suggestions Test Screenshot" />
+                    </div>
+                    <div class="test-logs">
+                        <h4>📝 Test Logs</h4>
+                        <div class="log-entry">Starting test: Suggestions Test</div>
+                        <div class="log-entry">Navigating to Google UK...</div>
+                        <div class="log-entry">Waiting for page to load...</div>
+                        <div class="log-entry">Handling cookie consent if present...</div>
+                        <div class="log-entry">No cookie consent dialog found or already accepted</div>
+                        <div class="log-entry">Finding search element...</div>
+                        <div class="log-entry">Found search element: textarea[name='q']</div>
+                        <div class="log-entry">Typing partial search query...</div>
+                        <div class="log-entry">Waiting for suggestions...</div>
+                        <div class="log-entry">Checking for suggestions dropdown...</div>
+                        <div class="log-entry">Found 10 suggestions</div>
+                        <div class="log-entry">✅ Suggestions test passed - Search suggestions displayed</div>
+                        <div class="log-entry">Screenshot saved: screenshots/Suggestions_Test_20250824_190916.png</div>
+                        <div class="log-entry">Test completed in 7.95 seconds</div>
+                    </div>
+                </div>
+            </div>
+            <div class="test-item">
+                <div class="test-header passed">
+                    <div class="test-title">✅ Images Tab Test</div>
+                    <div class="test-status passed">PASSED</div>
+                </div>
+                <div class="test-details">
+                    <div class="test-info">
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">PASSED</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Duration</div>
+                            <div class="info-value">9.00s</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Started</div>
+                            <div class="info-value">18:09:19</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Message</div>
+                            <div class="info-value">Test 'Images Tab Test' completed successfully</div>
+                        </div>
+                    </div>
+                    <div class="test-screenshot">
+                        <h4>📸 Test Screenshot</h4>
+                        <img src="screenshots/Images_Tab_Test_20250824_190928.png" alt="Images Tab Test Screenshot" />
+                    </div>
+                    <div class="test-logs">
+                        <h4>📝 Test Logs</h4>
+                        <div class="log-entry">Starting test: Images Tab Test</div>
+                        <div class="log-entry">Navigating to Google UK...</div>
+                        <div class="log-entry">Waiting for page to load...</div>
+                        <div class="log-entry">Handling cookie consent if present...</div>
+                        <div class="log-entry">No cookie consent dialog found or already accepted</div>
+                        <div class="log-entry">Waiting for Images tab...</div>
+                        <div class="log-entry">Clicking Images tab...</div>
+                        <div class="log-entry">Waiting for Images page to load...</div>
+                        <div class="log-entry">Checking if we're on Images page...</div>
+                        <div class="log-entry">Current URL: https://www.google.com/imghp?hl=en&ogbl</div>
+                        <div class="log-entry">✅ Images tab test passed - Successfully navigated to Images</div>
+                        <div class="log-entry">Screenshot saved: screenshots/Images_Tab_Test_20250824_190928.png</div>
+                        <div class="log-entry">Test completed in 9.00 seconds</div>
+                    </div>
+                </div>
+            </div>
+            <div class="test-item">
+                <div class="test-header passed">
+                    <div class="test-title">✅ Empty Search Test</div>
+                    <div class="test-status passed">PASSED</div>
+                </div>
+                <div class="test-details">
+                    <div class="test-info">
+                        <div class="info-item">
+                            <div class="info-label">Status</div>
+                            <div class="info-value">PASSED</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Duration</div>
+                            <div class="info-value">6.75s</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Started</div>
+                            <div class="info-value">18:09:31</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Message</div>
+                            <div class="info-value">Test 'Empty Search Test' completed successfully</div>
+                        </div>
+                    </div>
+                    <div class="test-screenshot">
+                        <h4>📸 Test Screenshot</h4>
+                        <img src="screenshots/Empty_Search_Test_20250824_190937.png" alt="Empty Search Test Screenshot" />
+                    </div>
+                    <div class="test-logs">
+                        <h4>📝 Test Logs</h4>
+                        <div class="log-entry">Starting test: Empty Search Test</div>
+                        <div class="log-entry">Navigating to Google UK...</div>
+                        <div class="log-entry">Waiting for page to load...</div>
+                        <div class="log-entry">Handling cookie consent if present...</div>
+                        <div class="log-entry">No cookie consent dialog found or already accepted</div>
+                        <div class="log-entry">Finding search element...</div>
+                        <div class="log-entry">Found search element: textarea[name='q']</div>
+                        <div class="log-entry">Pressing Enter without entering text...</div>
+                        <div class="log-entry">Waiting for page to process...</div>
+                        <div class="log-entry">Checking current URL...</div>
+                        <div class="log-entry">Current URL: https://www.google.com/</div>
+                        <div class="log-entry">⚠️ Empty search behavior different than expected, but continuing...</div>
+                        <div class="log-entry">Screenshot saved: screenshots/Empty_Search_Test_20250824_190937.png</div>
+                        <div class="log-entry">Test completed in 6.75 seconds</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Generated by Playwright C# Test Runner</p>
+            <p>Test automation for Google UK functionality</p>
+        </div>
+    </div>
+</body>
+</html>

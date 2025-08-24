@@ -1,0 +1,72 @@
+# Simple Azure DevOps Pipeline for Playwright Tests
+# This pipeline runs your Google Search Playwright tests in CI/CD
+
+trigger:
+  - main
+  - develop
+
+pr:
+  - main
+  - develop
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  dotNetVersion: '8.0.x'
+
+stages:
+- stage: Test
+  displayName: 'Run Playwright Tests'
+  jobs:
+  - job: PlaywrightTests
+    displayName: 'Execute Playwright Tests'
+    steps:
+    - task: UseDotNetVersion@2
+      displayName: 'Use .NET 8.0'
+      inputs:
+        version: '$(dotNetVersion)'
+        includePreviewVersions: false
+
+    - script: |
+        dotnet --version
+      displayName: 'Display .NET version'
+
+    - script: |
+        dotnet restore
+      displayName: 'Restore packages'
+
+    - script: |
+        dotnet build --configuration $(buildConfiguration) --no-restore
+      displayName: 'Build solution'
+
+    - script: |
+        dotnet tool install --global Microsoft.Playwright.CLI
+      displayName: 'Install Playwright CLI'
+
+    - script: |
+        playwright install
+      displayName: 'Install browsers'
+
+    - script: |
+        dotnet run --configuration $(buildConfiguration) --no-build
+      displayName: 'Run Playwright tests'
+      env:
+        PLAYWRIGHT_HEADLESS: 'true'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish HTML report'
+      inputs:
+        PathtoPublish: 'test-report.html'
+        ArtifactName: 'TestReport'
+        publishLocation: 'Container'
+      condition: succeededOrFailed()
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish screenshots'
+      inputs:
+        PathtoPublish: 'screenshots'
+        ArtifactName: 'Screenshots'
+        publishLocation: 'Container'
+      condition: succeededOrFailed()

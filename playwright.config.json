@@ -1,0 +1,39 @@
+{
+  "testDir": ".",
+  "testMatch": "**/*Tests.cs",
+  "timeout": 30000,
+  "expect": {
+    "timeout": 5000
+  },
+  "fullyParallel": true,
+  "forbidOnly": false,
+  "retries": 2,
+  "workers": 1,
+  "reporter": "html",
+  "use": {
+    "baseURL": "https://www.google.co.uk",
+    "trace": "on-first-retry",
+    "screenshot": "only-on-failure",
+    "video": "retain-on-failure"
+  },
+  "projects": [
+    {
+      "name": "chromium",
+      "use": {
+        "browserName": "chromium"
+      }
+    },
+    {
+      "name": "firefox",
+      "use": {
+        "browserName": "firefox"
+      }
+    },
+    {
+      "name": "webkit",
+      "use": {
+        "browserName": "webkit"
+      }
+    }
+  ]
+}
