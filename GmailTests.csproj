@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Playwright" Version="1.54.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="TestResult.cs" />
+    <Compile Include="GmailLoginTestRunner.cs" />
+    <Compile Include="GmailTestConfig.cs" />
+    <Compile Include="Tests/GmailLoginTest.cs" />
+    <Compile Include="Tests/GmailLoginTestEnhanced.cs" />
+  </ItemGroup>
+
+</Project>
