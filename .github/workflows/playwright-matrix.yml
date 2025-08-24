@@ -16,6 +16,17 @@ on:
         - chrome
         - firefox
         - webkit
+      test-scenario:
+        description: 'Test scenario to run'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - bedbath-login
+        - gmail-login
+        - furniture-navigation
+        - tripadvisor-search
 
 jobs:
   test:
@@ -48,30 +59,41 @@ jobs:
         
     - name: Restore dependencies
       run: dotnet restore
-      
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-      
+        
+    - name: Build Bed Bath & Beyond Tests
+      run: dotnet build BedBathBeyondTests.csproj --configuration Release --no-restore
+        
+    - name: Build Gmail Tests
+      run: dotnet build GmailTests.csproj --configuration Release --no-restore
+        
     - name: Install Playwright CLI
       run: dotnet tool install --global Microsoft.Playwright.CLI
-      
+        
     - name: Install Playwright browsers
       run: playwright install
-      
-    - name: Run Playwright tests with ${{ matrix.browser-name }}
+        
+    - name: Run Bed Bath & Beyond Tests with ${{ matrix.browser-name }}
       run: |
-        echo "Running tests with ${{ matrix.browser-name }}"
-        dotnet run --configuration Release --no-build
+        echo "Running Bed Bath & Beyond Tests with ${{ matrix.browser-name }}..."
+        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
         PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
         
-    - name: Upload HTML report for ${{ matrix.browser-name }}
+    - name: Run Gmail Tests with ${{ matrix.browser-name }}
+      run: |
+        echo "Running Gmail Tests with ${{ matrix.browser-name }}..."
+        dotnet run --project GmailTests.csproj --configuration Release --no-build
+      env:
+        PLAYWRIGHT_HEADLESS: true
+        PLAYWRIGHT_BROWSER: ${{ matrix.browser }}
+        
+    - name: Upload HTML reports for ${{ matrix.browser-name }}
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-report-${{ matrix.browser }}
-        path: test-report.html
+        name: html-reports-${{ matrix.browser }}
+        path: reports/
         
     - name: Upload screenshots for ${{ matrix.browser-name }}
       uses: actions/upload-artifact@v4
@@ -103,18 +125,26 @@ jobs:
         
     - name: Generate summary report
       run: |
-        echo "## 🧪 Playwright Test Summary" >> $GITHUB_STEP_SUMMARY
+        echo "## 🧪 Playwright Matrix Test Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📊 Test Results by Browser" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         
         for browser in chrome firefox webkit; do
-          if [ -d "artifacts/test-report-$browser" ]; then
+          if [ -d "artifacts/html-reports-$browser" ]; then
             echo "✅ **$browser**: Tests completed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **$browser**: Tests failed or not completed" >> $GITHUB_STEP_SUMMARY
           fi
         done
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🧪 Test Scenarios Covered" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- **Bed Bath & Beyond**: Login, Furniture Navigation" >> $GITHUB_STEP_SUMMARY
+        echo "- **Gmail**: Login automation" >> $GITHUB_STEP_SUMMARY
+        echo "- **TripAdvisor**: Poole search automation" >> $GITHUB_STEP_SUMMARY
+        echo "- **HTML Reports**: Automated test result generation" >> $GITHUB_STEP_SUMMARY
         
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📁 Artifacts Available" >> $GITHUB_STEP_SUMMARY
@@ -135,7 +165,7 @@ jobs:
           
           const browsers = ['chrome', 'firefox', 'webkit'];
           browsers.forEach(browser => {
-            const reportPath = `artifacts/test-report-${browser}/test-report.html`;
+            const reportPath = `artifacts/html-reports-${browser}`;
             if (fs.existsSync(reportPath)) {
               comment += `✅ **${browser.charAt(0).toUpperCase() + browser.slice(1)}**: Tests completed successfully\n`;
             } else {
@@ -143,7 +173,13 @@ jobs:
             }
           });
           
-          comment += '\n### 📁 Artifacts Available\n\n';
+          comment += '\n### 🧪 Test Scenarios Covered\n\n';
+          comment += '- **🛏️ Bed Bath & Beyond**: Login automation, Furniture navigation\n';
+          comment += '- **📧 Gmail**: Login automation with enhanced scenarios\n';
+          comment += '- **🛎️ TripAdvisor**: Poole search automation\n';
+          comment += '- **📊 HTML Reports**: Automated test result generation\n\n';
+          
+          comment += '### 📁 Artifacts Available\n\n';
           comment += '- **HTML Reports**: Download from Actions artifacts\n';
           comment += '- **Screenshots**: Visual evidence of test execution\n';
           comment += '- **Test Videos**: Recordings of test runs\n\n';

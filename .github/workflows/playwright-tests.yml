@@ -27,27 +27,49 @@ jobs:
         
     - name: Restore dependencies
       run: dotnet restore
-      
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-      
+        
+    - name: Build Bed Bath & Beyond Tests
+      run: dotnet build BedBathBeyondTests.csproj --configuration Release --no-restore
+        
+    - name: Build Gmail Tests
+      run: dotnet build GmailTests.csproj --configuration Release --no-restore
+        
     - name: Install Playwright CLI
       run: dotnet tool install --global Microsoft.Playwright.CLI
-      
+        
     - name: Install Playwright browsers
       run: playwright install
-      
-    - name: Run Playwright tests
-      run: dotnet run --configuration Release --no-build
+        
+    - name: Run Bed Bath & Beyond Login Tests
+      run: |
+        echo "Running Bed Bath & Beyond Login Tests..."
+        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
+        PLAYWRIGHT_BROWSER: chromium
         
-    - name: Upload HTML report
+    - name: Run Gmail Login Tests
+      run: |
+        echo "Running Gmail Login Tests..."
+        dotnet run --project GmailTests.csproj --configuration Release --no-build
+      env:
+        PLAYWRIGHT_HEADLESS: true
+        PLAYWRIGHT_BROWSER: chromium
+        
+    - name: Generate HTML Report Demo
+      run: |
+        echo "Generating HTML Report Demo..."
+        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
+      env:
+        PLAYWRIGHT_HEADLESS: true
+        PLAYWRIGHT_BROWSER: chromium
+        
+    - name: Upload HTML reports
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: test-report
-        path: test-report.html
+        name: html-reports
+        path: reports/
         
     - name: Upload screenshots
       uses: actions/upload-artifact@v4
@@ -71,10 +93,24 @@ jobs:
           const fs = require('fs');
           let comment = '## 🧪 Playwright Test Results\n\n';
           
+          comment += '### 🛏️ Bed Bath & Beyond Tests\n';
+          comment += '- Login automation with enhanced error handling\n';
+          comment += '- Furniture navigation automation\n';
+          comment += '- Configuration-based test execution\n\n';
+          
+          comment += '### 📧 Gmail Tests\n';
+          comment += '- Gmail login automation\n';
+          comment += '- Enhanced login with multiple scenarios\n\n';
+          
+          comment += '### 🛎️ TripAdvisor Tests\n';
+          '- Poole search automation\n';
+          '- Cookie consent handling\n\n';
+          
           try {
-            if (fs.existsSync('test-report.html')) {
-              comment += '✅ **HTML Report Generated**\n';
-              comment += '📄 Download the report from the Actions artifacts\n\n';
+            if (fs.existsSync('reports/')) {
+              const reports = fs.readdirSync('reports/').filter(f => f.endsWith('.html'));
+              comment += `📄 **HTML Reports Generated**: ${reports.length} files\n`;
+              comment += '📁 Download from Actions artifacts\n\n';
             }
             
             if (fs.existsSync('screenshots/')) {
