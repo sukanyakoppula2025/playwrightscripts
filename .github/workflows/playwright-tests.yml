@@ -29,10 +29,13 @@ jobs:
       run: dotnet restore
         
     - name: Build Bed Bath & Beyond Tests
-      run: dotnet build BedBathBeyondTests.csproj --configuration Release --no-restore
+      run: dotnet build "BedBathBeyondTests.csproj" --configuration Release --no-restore
         
     - name: Build Gmail Tests
-      run: dotnet build GmailTests.csproj --configuration Release --no-restore
+      run: dotnet build "GmailTests.csproj" --configuration Release --no-restore
+        
+    - name: Build Google Search Tests
+      run: dotnet build "GoogleSearchTests.csproj" --configuration Release --no-restore
         
     - name: Install Playwright CLI
       run: dotnet tool install --global Microsoft.Playwright.CLI
@@ -43,7 +46,7 @@ jobs:
     - name: Run Bed Bath & Beyond Login Tests
       run: |
         echo "Running Bed Bath & Beyond Login Tests..."
-        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
+        dotnet run --project "BedBathBeyondTests.csproj" --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
         PLAYWRIGHT_BROWSER: chromium
@@ -51,7 +54,15 @@ jobs:
     - name: Run Gmail Login Tests
       run: |
         echo "Running Gmail Login Tests..."
-        dotnet run --project GmailTests.csproj --configuration Release --no-build
+        dotnet run --project "GmailTests.csproj" --configuration Release --no-build
+      env:
+        PLAYWRIGHT_HEADLESS: true
+        PLAYWRIGHT_BROWSER: chromium
+        
+    - name: Run Google Search Tests
+      run: |
+        echo "Running Google Search Tests..."
+        dotnet run --project "GoogleSearchTests.csproj" --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
         PLAYWRIGHT_BROWSER: chromium
@@ -59,7 +70,7 @@ jobs:
     - name: Generate HTML Report Demo
       run: |
         echo "Generating HTML Report Demo..."
-        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
+        dotnet run --project "BedBathBeyondTests.csproj" --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
         PLAYWRIGHT_BROWSER: chromium
@@ -99,31 +110,22 @@ jobs:
           comment += '- Configuration-based test execution\n\n';
           
           comment += '### 📧 Gmail Tests\n';
-          comment += '- Gmail login automation\n';
-          comment += '- Enhanced login with multiple scenarios\n\n';
+          comment += '- Login automation with enhanced scenarios\n';
+          comment += '- Configuration-based test execution\n';
+          comment += '- Error handling and reporting\n\n';
           
-          comment += '### 🛎️ TripAdvisor Tests\n';
-          '- Poole search automation\n';
-          '- Cookie consent handling\n\n';
+          comment += '### 🔍 Google Search Tests\n';
+          comment += '- Web search automation\n';
+          comment += '- Playwright-based testing\n';
+          comment += '- Cross-browser compatibility\n\n';
           
-          try {
-            if (fs.existsSync('reports/')) {
-              const reports = fs.readdirSync('reports/').filter(f => f.endsWith('.html'));
-              comment += `📄 **HTML Reports Generated**: ${reports.length} files\n`;
-              comment += '📁 Download from Actions artifacts\n\n';
-            }
-            
-            if (fs.existsSync('screenshots/')) {
-              const screenshots = fs.readdirSync('screenshots/').filter(f => f.endsWith('.png'));
-              comment += `📸 **Screenshots Captured**: ${screenshots.length} files\n\n`;
-            }
-            
-            comment += '🔍 **View Results**: Check the Actions tab for detailed logs and artifacts';
-            
-          } catch (error) {
-            comment += '❌ **Error reading test results**\n';
-            comment += 'Check the Actions logs for details';
-          }
+          comment += '### 📊 Test Artifacts\n';
+          comment += '- **Screenshots**: Test execution captures\n';
+          comment += '- **Videos**: Test execution recordings\n';
+          comment += '- **HTML Reports**: Professional test reports\n';
+          comment += '- **Logs**: Detailed execution logs\n\n';
+          
+          comment += '🔍 **View Results**: Check the Actions tab for detailed logs and artifacts';
           
           github.rest.issues.createComment({
             issue_number: context.issue.number,

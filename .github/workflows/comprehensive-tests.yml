@@ -14,10 +14,9 @@ on:
         type: choice
         options:
         - all
-        - bedbath-login
-        - bedbath-furniture
-        - gmail-login
-        - tripadvisor-search
+        - bedbath-tests
+        - gmail-tests
+        - google-search-tests
         - html-reports
       browser:
         description: 'Browser to test with'
@@ -30,10 +29,10 @@ on:
         - webkit
 
 jobs:
-  test-bedbath-login:
-    name: 🛏️ Bed Bath & Beyond Login Tests
+  test-bedbath:
+    name: 🛏️ Bed Bath & Beyond Tests
     runs-on: windows-latest
-    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'bedbath-login'
+    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'bedbath-tests'
     
     steps:
     - name: Checkout code
@@ -45,75 +44,35 @@ jobs:
         dotnet-version: '8.0.x'
         
     - name: Build Bed Bath & Beyond Tests
-      run: dotnet build BedBathBeyondTests.csproj --configuration Release
+      run: dotnet build "BedBathBeyondTests.csproj" --configuration Release
         
     - name: Install Playwright
       run: |
         dotnet tool install --global Microsoft.Playwright.CLI
         playwright install
         
-    - name: Run Bed Bath & Beyond Login Tests
+    - name: Run Bed Bath & Beyond Tests
       run: |
-        echo "Running Bed Bath & Beyond Login Tests..."
-        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
+        echo "Running Bed Bath & Beyond Tests..."
+        dotnet run --project "BedBathBeyondTests.csproj" --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
         PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
         
-    - name: Upload Login Test Results
+    - name: Upload Bed Bath & Beyond Test Results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: bedbath-login-results
+        name: bedbath-results
         path: |
           screenshots/
           videos/
           reports/
           
-  test-bedbath-furniture:
-    name: 🪑 Bed Bath & Beyond Furniture Navigation
+  test-gmail:
+    name: 📧 Gmail Tests
     runs-on: windows-latest
-    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'bedbath-furniture'
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0.x'
-        
-    - name: Build Bed Bath & Beyond Tests
-      run: dotnet build BedBathBeyondTests.csproj --configuration Release
-        
-    - name: Install Playwright
-      run: |
-        dotnet tool install --global Microsoft.Playwright.CLI
-        playwright install
-        
-    - name: Run Furniture Navigation Tests
-      run: |
-        echo "Running Bed Bath & Beyond Furniture Navigation Tests..."
-        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
-      env:
-        PLAYWRIGHT_HEADLESS: true
-        PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
-        
-    - name: Upload Furniture Test Results
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: bedbath-furniture-results
-        path: |
-          screenshots/
-          videos/
-          reports/
-          
-  test-gmail-login:
-    name: 📧 Gmail Login Tests
-    runs-on: windows-latest
-    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'gmail-login'
+    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'gmail-tests'
     
     steps:
     - name: Checkout code
@@ -125,17 +84,17 @@ jobs:
         dotnet-version: '8.0.x'
         
     - name: Build Gmail Tests
-      run: dotnet build GmailTests.csproj --configuration Release
+      run: dotnet build "GmailTests.csproj" --configuration Release
         
     - name: Install Playwright
       run: |
         dotnet tool install --global Microsoft.Playwright.CLI
         playwright install
         
-    - name: Run Gmail Login Tests
+    - name: Run Gmail Tests
       run: |
-        echo "Running Gmail Login Tests..."
-        dotnet run --project GmailTests.csproj --configuration Release --no-build
+        echo "Running Gmail Tests..."
+        dotnet run --project "GmailTests.csproj" --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
         PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
@@ -144,16 +103,16 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: gmail-login-results
+        name: gmail-results
         path: |
           screenshots/
           videos/
           reports/
           
-  test-tripadvisor-search:
-    name: 🛎️ TripAdvisor Poole Search Tests
+  test-google-search:
+    name: 🔍 Google Search Tests
     runs-on: windows-latest
-    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'tripadvisor-search'
+    if: github.event.inputs.test_scenario == 'all' || github.event.inputs.test_scenario == 'google-search-tests'
     
     steps:
     - name: Checkout code
@@ -164,27 +123,27 @@ jobs:
       with:
         dotnet-version: '8.0.x'
         
-    - name: Build Bed Bath & Beyond Tests (contains TripAdvisor tests)
-      run: dotnet build BedBathBeyondTests.csproj --configuration Release
+    - name: Build Google Search Tests
+      run: dotnet build "GoogleSearchTests.csproj" --configuration Release
         
     - name: Install Playwright
       run: |
         dotnet tool install --global Microsoft.Playwright.CLI
         playwright install
         
-    - name: Run TripAdvisor Search Tests
+    - name: Run Google Search Tests
       run: |
-        echo "Running TripAdvisor Poole Search Tests..."
-        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
+        echo "Running Google Search Tests..."
+        dotnet run --project "GoogleSearchTests.csproj" --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
         PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
         
-    - name: Upload TripAdvisor Test Results
+    - name: Upload Google Search Test Results
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: tripadvisor-search-results
+        name: google-search-results
         path: |
           screenshots/
           videos/
@@ -205,7 +164,7 @@ jobs:
         dotnet-version: '8.0.x'
         
     - name: Build Bed Bath & Beyond Tests
-      run: dotnet build BedBathBeyondTests.csproj --configuration Release
+      run: dotnet build "BedBathBeyondTests.csproj" --configuration Release
         
     - name: Install Playwright
       run: |
@@ -215,7 +174,7 @@ jobs:
     - name: Generate HTML Report Demo
       run: |
         echo "Generating HTML Report Demo..."
-        dotnet run --project BedBathBeyondTests.csproj --configuration Release --no-build
+        dotnet run --project "BedBathBeyondTests.csproj" --configuration Release --no-build
       env:
         PLAYWRIGHT_HEADLESS: true
         PLAYWRIGHT_BROWSER: ${{ github.event.inputs.browser || 'chromium' }}
@@ -230,7 +189,7 @@ jobs:
   summary-report:
     name: 📋 Test Summary Report
     runs-on: ubuntu-latest
-    needs: [test-bedbath-login, test-bedbath-furniture, test-gmail-login, test-tripadvisor-search, generate-html-reports]
+    needs: [test-bedbath, test-gmail, test-google-search, generate-html-reports]
     if: always()
     
     steps:
@@ -246,28 +205,24 @@ jobs:
       run: |
         echo "## 🧪 Comprehensive Playwright Test Summary" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### 🧪 Test Scenarios Executed" >> $GITHUB_STEP_SUMMARY
+        echo "### 🧪 Test Projects Executed" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         
-        # Check which test scenarios were run
-        if [ -d "artifacts/bedbath-login-results" ]; then
-          echo "✅ **Bed Bath & Beyond Login Tests**: Completed" >> $GITHUB_STEP_SUMMARY
+        # Check which test projects were run
+        if [ -d "artifacts/bedbath-results" ]; then
+          echo "✅ **Bed Bath & Beyond Tests**: Completed successfully" >> $GITHUB_STEP_SUMMARY
         fi
         
-        if [ -d "artifacts/bedbath-furniture-results" ]; then
-          echo "✅ **Bed Bath & Beyond Furniture Navigation**: Completed" >> $GITHUB_STEP_SUMMARY
+        if [ -d "artifacts/gmail-results" ]; then
+          echo "✅ **Gmail Tests**: Completed successfully" >> $GITHUB_STEP_SUMMARY
         fi
         
-        if [ -d "artifacts/gmail-login-results" ]; then
-          echo "✅ **Gmail Login Tests**: Completed" >> $GITHUB_STEP_SUMMARY
-        fi
-        
-        if [ -d "artifacts/tripadvisor-search-results" ]; then
-          echo "✅ **TripAdvisor Poole Search**: Completed" >> $GITHUB_STEP_SUMMARY
+        if [ -d "artifacts/google-search-results" ]; then
+          echo "✅ **Google Search Tests**: Completed successfully" >> $GITHUB_STEP_SUMMARY
         fi
         
         if [ -d "artifacts/html-reports-generated" ]; then
-          echo "✅ **HTML Report Generation**: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **HTML Report Generation**: Completed successfully" >> $GITHUB_STEP_SUMMARY
         fi
         
         echo "" >> $GITHUB_STEP_SUMMARY
@@ -285,28 +240,27 @@ jobs:
           const fs = require('fs');
           let comment = '## 🧪 Comprehensive Playwright Test Results\n\n';
           
-          comment += '### 🧪 Test Scenarios Executed\n\n';
+          comment += '### 🧪 Test Projects Executed\n\n';
           
-          const scenarios = [
-            { name: 'Bed Bath & Beyond Login Tests', path: 'artifacts/bedbath-login-results' },
-            { name: 'Bed Bath & Beyond Furniture Navigation', path: 'artifacts/bedbath-furniture-results' },
-            { name: 'Gmail Login Tests', path: 'artifacts/gmail-login-results' },
-            { name: 'TripAdvisor Poole Search', path: 'artifacts/tripadvisor-search-results' },
+          const projects = [
+            { name: 'Bed Bath & Beyond Tests', path: 'artifacts/bedbath-results' },
+            { name: 'Gmail Tests', path: 'artifacts/gmail-results' },
+            { name: 'Google Search Tests', path: 'artifacts/google-search-results' },
             { name: 'HTML Report Generation', path: 'artifacts/html-reports-generated' }
           ];
           
-          scenarios.forEach(scenario => {
-            if (fs.existsSync(scenario.path)) {
-              comment += `✅ **${scenario.name}**: Completed successfully\n`;
+          projects.forEach(project => {
+            if (fs.existsSync(project.path)) {
+              comment += `✅ **${project.name}**: Completed successfully\n`;
             } else {
-              comment += `❌ **${scenario.name}**: Not executed or failed\n`;
+              comment += `❌ **${project.name}**: Not executed or failed\n`;
             }
           });
           
           comment += '\n### 🚀 Key Features\n\n';
           comment += '- **🛏️ Bed Bath & Beyond**: Login automation, Furniture navigation\n';
           comment += '- **📧 Gmail**: Login automation with enhanced scenarios\n';
-          comment += '- **🛎️ TripAdvisor**: Poole search automation\n';
+          comment += '- **🔍 Google Search**: Web search automation\n';
           comment += '- **📊 HTML Reports**: Professional test result generation\n';
           comment += '- **⚙️ Configuration**: Environment-specific test settings\n';
           comment += '- **🔄 Cross-browser**: Support for Chrome, Firefox, Safari\n\n';
