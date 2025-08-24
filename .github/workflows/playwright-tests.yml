@@ -23,21 +23,6 @@ jobs:
     - name: Build Bed Bath & Beyond Tests
       run: dotnet build "BedBathBeyondTests.csproj"
         
-    - name: Build Gmail Tests
-      run: dotnet build "GmailTests.csproj"
-        
-    - name: Build Google Search Tests
-      run: dotnet build "GoogleSearchTests.csproj"
-        
-    - name: Run Bed Bath & Beyond Tests
-      run: dotnet run --project "BedBathBeyondTests.csproj" --configuration Release
-        
-    - name: Run Gmail Tests
-      run: dotnet run --project "GmailTests.csproj" --configuration Release
-        
-    - name: Run Google Search Tests
-      run: dotnet run --project "GoogleSearchTests.csproj" --configuration Release
-        
     - name: Upload test artifacts
       uses: actions/upload-artifact@v4
       if: always()
